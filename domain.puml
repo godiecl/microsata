@@ -104,7 +104,7 @@ package cl.ucn.fondef {
                 'Usuario +-- Estado
                 Usuario --> "1" RolUsuario: - rolUsuario
                 Usuario --> "1" EstadoUsuario: - estadoUsuario
-                Usuario <.. UsuarioRepository: <<uses>>
+                ' Usuario <.. UsuarioRepository: <<uses>>
 
                 enum TipoRegistro <<inner>> {
                     NONE
@@ -133,7 +133,7 @@ package cl.ucn.fondef {
                 Registro --|> BaseEntity
                 Registro --> "1" TipoRegistro: - tipoRegistro
                 Registro --> "1" Usuario: - usuario
-                Registro <.. RegistroRepository: <<uses>>
+                ' Registro <.. RegistroRepository: <<uses>>
             }
 
             package device {
@@ -184,7 +184,7 @@ package cl.ucn.fondef {
                 Equipo --|> BaseEntity
                 Equipo --> "*" Archivo: - archivos: List<Archivo>
                 Equipo --> "1" EstadoEquipo: - getEstadoEquipo
-                Equipo <.. EquipoRepository: <<uses>>
+                ' Equipo <.. EquipoRepository: <<uses>>
             }
         }
 
@@ -231,9 +231,9 @@ package cl.ucn.fondef {
                 + retrieveUsuario(request: RetrieveUsuarioReq, responseObserver: StreamObserver<UsuarioGrpc>): void
                 + retrieveUsuarios(request: EmptyReq, responseObserver: StreamObserver<GetUsuarioReply>): void
             }
-            UsuarioServiceGprc ..> UsuarioGrpc: <<uses>>
-            UsuarioServiceGprc ..> ArchivoGrpc: <<uses>>
-            UsuarioServiceGprc ..> EquipoGrpc: <<uses>>
+            ' UsuarioServiceGprc ..> UsuarioGrpc: <<uses>>
+            ' UsuarioServiceGprc ..> ArchivoGrpc: <<uses>>
+            ' UsuarioServiceGprc ..> EquipoGrpc: <<uses>>
 
             class UsuarioServiceGrpcImpl {
                 + UsuarioServiceGrpcImpl(sataService: MicroSataService, registroRepository: RegistroRepository)
