@@ -84,7 +84,7 @@ public class UsuarioServiceGrpcImpl extends UsuarioServiceGrpc.UsuarioServiceImp
             // Send the UsuarioGrpc
             // responseObserver.onNext(ModelMapper.INSTANCE.mapRemovePassword(usuario));
             // FIXME: Remove the password on sent!
-            responseObserver.onNext(ModelMapper.INSTANCE.map(usuario));
+            responseObserver.onNext(ModelMapper.INSTANCE.toUsuarioGrpc(usuario));
             responseObserver.onCompleted();
         }, () -> {
             responseObserver.onError(buildException(Code.PERMISSION_DENIED, "Wrong Credentials"));
@@ -112,7 +112,7 @@ public class UsuarioServiceGrpcImpl extends UsuarioServiceGrpc.UsuarioServiceImp
         log.debug("UsuarioGrpc to save: {}", BaseEntity.toString(usuarioGrpc));
 
         // Create the usuario
-        Usuario usuario = this.sataService.addUsuario(ModelMapper.INSTANCE.map(usuarioGrpc));
+        Usuario usuario = this.sataService.addUsuario(ModelMapper.INSTANCE.toUsuario(usuarioGrpc));
         log.debug("Usuario saved: {}", usuario);
 
         // Register the operation
@@ -130,7 +130,7 @@ public class UsuarioServiceGrpcImpl extends UsuarioServiceGrpc.UsuarioServiceImp
 
         // FIXME: Remove the password on sent!
         // responseObserver.onNext(ModelMapper.INSTANCE.mapRemovePassword(usuario));
-        responseObserver.onNext(ModelMapper.INSTANCE.map(usuario));
+        responseObserver.onNext(ModelMapper.INSTANCE.toUsuarioGrpc(usuario));
         responseObserver.onCompleted();
     }
 
@@ -147,7 +147,7 @@ public class UsuarioServiceGrpcImpl extends UsuarioServiceGrpc.UsuarioServiceImp
             // Send the UsuarioGrpc
             // FIXME: Remove the password on sent!
             // responseObserver.onNext(ModelMapper.INSTANCE.mapRemovePassword(usuario));
-            responseObserver.onNext(ModelMapper.INSTANCE.map(usuario));
+            responseObserver.onNext(ModelMapper.INSTANCE.toUsuarioGrpc(usuario));
             responseObserver.onCompleted();
         }, () -> {
             responseObserver.onError(buildException(Code.NOT_FOUND,

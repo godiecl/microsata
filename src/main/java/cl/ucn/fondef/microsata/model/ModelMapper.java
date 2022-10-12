@@ -48,14 +48,26 @@ public interface ModelMapper {
     @Mapping(target = "modifiedAt", ignore = true)
     @Mapping(target = "estadoUsuario", source = "estadoUsuarioGrpc")
     @Mapping(target = "rolUsuario", source = "rolUsuarioGrpc")
-    Usuario map(UsuarioGrpc usuarioGrpc);
+    Usuario toUsuario(UsuarioGrpc usuarioGrpc);
+
+    /**
+     * List of UsuarioGprc to Usuario.
+     */
+    @IterableMapping(qualifiedByName = "UsuarioGrpc2Usuario")
+    List<Usuario> toUsuario(List<UsuarioGrpc> usuariosGrpc);
 
     /**
      * Usuario to UsuarioGrpc.
      */
     @Named(value = "Usuario2UsuarioGrpc")
     @InheritInverseConfiguration
-    UsuarioGrpc map(Usuario usuario);
+    UsuarioGrpc toUsuarioGrpc(Usuario usuario);
+
+    /**
+     * List of Usuario to UsuarioGrpc.
+     */
+    @IterableMapping(qualifiedByName = "Usuario2UsuarioGrpc")
+    List<UsuarioGrpc> toUsuarioGrpc(List<Usuario> usuarios);
 
     /**
      * UsuarioGrpc.Rol to Usuario.Rol.
@@ -67,13 +79,13 @@ public interface ModelMapper {
             @ValueMapping(source = "ROL_USUARIO_GRPC_CONFIGURADOR", target = "ROL_CONFIGURADOR"),
             @ValueMapping(source = "ROL_USUARIO_GRPC_OPERADOR", target = "ROL_OPERADOR"),
     })
-    Usuario.RolUsuario map(UsuarioGrpc.RolUsuarioGrpc rol);
+    Usuario.RolUsuario toRolUsuario(UsuarioGrpc.RolUsuarioGrpc rol);
 
     /**
      * Usuario.Rol to UsuarioGrpc.Rol.
      */
     @InheritInverseConfiguration
-    UsuarioGrpc.RolUsuarioGrpc map(Usuario.RolUsuario rol);
+    UsuarioGrpc.RolUsuarioGrpc toRolUsuarioGrpc(Usuario.RolUsuario rol);
 
     /**
      * UsuarioGrpc.Rol to Usuario.Rol.
@@ -84,25 +96,13 @@ public interface ModelMapper {
             @ValueMapping(source = "ESTADO_USUARIO_GRPC_ACTIVO", target = "ESTADO_ACTIVO"),
             @ValueMapping(source = "ESTADO_USUARIO_GRPC_INACTIVO", target = "ESTADO_INACTIVO"),
     })
-    Usuario.EstadoUsuario map(UsuarioGrpc.EstadoUsuarioGrpc estado);
+    Usuario.EstadoUsuario toEstadoUsuario(UsuarioGrpc.EstadoUsuarioGrpc estado);
 
     /**
      * Usuario.Estado to UsuarioGrpc.Estado.
      */
     @InheritInverseConfiguration
-    UsuarioGrpc.EstadoUsuarioGrpc map(Usuario.EstadoUsuario estado);
-
-    /**
-     * List of Usuario to UsuarioGrpc.
-     */
-    @IterableMapping(qualifiedByName = "Usuario2UsuarioGrpc")
-    List<UsuarioGrpc> toUsuarioGrpc(List<Usuario> usuarios);
-
-    /**
-     * List of UsuarioGprc to Usuario.
-     */
-    @IterableMapping(qualifiedByName = "UsuarioGrpc2Usuario")
-    List<Usuario> toUsuario(List<UsuarioGrpc> usuariosGrpc);
+    UsuarioGrpc.EstadoUsuarioGrpc toEstadoUsuarioGrpc(Usuario.EstadoUsuario estado);
 
     /*
      * Usuario to UsuarioGrpc without password.

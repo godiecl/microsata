@@ -109,7 +109,7 @@ public class TestGrpc {
                         .setPassword("admin123")
                         .build());
                 log.debug("UsuarioGrpc received: {}", BaseEntity.toString(usuarioGrpc));
-                log.debug("Usuario received: {}", ModelMapper.INSTANCE.map(usuarioGrpc));
+                log.debug("Usuario received: {}", ModelMapper.INSTANCE.toUsuario(usuarioGrpc));
             });
 
             // Ok credentials
@@ -119,7 +119,7 @@ public class TestGrpc {
                         .setPassword("admin123")
                         .build());
                 log.debug("UsuarioGrpc received: {}", BaseEntity.toString(usuarioGrpc));
-                log.debug("Usuario received: {}", ModelMapper.INSTANCE.map(usuarioGrpc));
+                log.debug("Usuario received: {}", ModelMapper.INSTANCE.toUsuario(usuarioGrpc));
             });
         }
 
