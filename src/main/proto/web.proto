@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "cl.ucn.fondef.microsata.grpc";
+option optimize_for = CODE_SIZE;
+
+import "google/protobuf/empty.proto";
+import "domain.proto";
+
+/**
+ * Login request.
+ */
+message AuthenticateReq {
+  string rut_email = 1;
+  string password = 2;
+}
+
+/**
+ * AddUsuario request.
+ */
+message AddUsuarioReq {
+  // Who made the req
+  int64 id_usuario = 1;
+  UsuarioGrpc usuario_grpc = 2;
+}
+
+/**
+ * RetrieveUsuario request.
+ */
+message RetrieveUsuarioReq {
+  string rut_email = 1;
+}
+
+/**
+ * GetUsuarios reply.
+ */
+message GetUsuariosReply {
+  repeated UsuarioGrpc usuarios_grpc = 1;
+}
+
+/**
+ * The Usuario Service.
+ */
+service UsuarioService {
+  // Authenticate with Credentials.
+  rpc authenticate(AuthenticateReq) returns (UsuarioGrpc);
+
+  // Insert a Usuario.
+  rpc addUsuario(AddUsuarioReq) returns (UsuarioGrpc);
+
+  // Get a specific Usuario.
+  rpc retrieveUsuario(RetrieveUsuarioReq) returns (UsuarioGrpc);
+
+  // Retrieve all the Usuarios.
+  rpc retrieveUsuarios(google.protobuf.Empty) returns (GetUsuariosReply);
+}
+
+/**
+ * RetrieveEquipo request.
+ */
+message RetrieveEquipoReq {
+  int64 id_equipo = 1;
+}
+
+/**
+ * AddEquipo request.
+ */
+message AddEquipoReq {
+  int64 id_usuario = 1;
+  EquipoGrpc equipo_grpc = 2;
+}
+
+/**
+ * RetrieveEquipos reply.
+ */
+message RetrieveEquiposReply {
+  repeated EquipoGrpc equipos_grpc = 1;
+}

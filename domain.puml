@@ -1,0 +1,263 @@
+@startuml
+left to right direction
+hide empty members
+skin rose
+skinparam classFontName Ubuntu Condensed
+skinparam IconPrivateColor red
+skinparam shadowing false
+
+package cl.ucn.fondef {
+
+    package microsata {
+
+        package dao {
+
+            interface UsuarioRepository <<interface>> {
+                + findByEmail(email: String): Usuario
+                + findByRut(rut: String): Usuario
+            }
+
+            interface EquipoRepository <<interface>> {
+                + retrieveWithArchivos(id: Long): Equipo
+            }
+
+            interface RegistroRepository <<interface>> {
+            }
+        }
+
+        package model #application {
+
+            class BaseEntity <<abstract>> {
+                - id: Long
+                - version: Long
+                - createdAt: Date
+                - modifiedAt: Date
+                + BaseEntity()
+                + BaseEntity(...)
+                + setId(id: Long): void
+                + getId(): Long
+                + toString(): String
+                + hashCode(): int
+                + equals(obj: Object): boolean
+                + {static} toString(obj: Object): String
+                - prePersist(): void
+            }
+
+            interface ModelMapper {
+                + {static} INSTANCE: ModelMapper
+                + map(usuarioGrpc: UsuarioGrpc): Usuario
+                + map(usuario: Usuario): UsuarioGrpc
+                + map(rolUsuarioGrpc: RolUsuarioGrpc): RolUsuario
+                + map(rolUsuario: RolUsuario): RolUsuarioGrpc
+                + map(estadoUsuarioGrpc: EstadoUsuarioGrpc): EstadoUsuario
+                + map(estadoUsuario: EstadoUsuario): EstadoUsuarioGrpc
+                + map(usuarios: List<Usuario>): List<UsuarioGrpc>
+            }
+
+            package exceptions {
+                class PreRequisitesException {
+                    + PreRequisitesException(message: String)
+                }
+
+                class IntegrityException {
+                    + IntegrityException(message: String)
+                }
+            }
+
+            package registry {
+
+                enum EstadoUsuario <<inner>> {
+                    ESTADO_UNSPECIFIED
+                    ESTADO_ACTIVO
+                    ESTADO_INACTIVO
+                }
+
+                enum RolUsuario <<inner>> {
+                    ROL_UNSPECIFIED
+                    ROL_ADMINISTRADOR
+                    ROL_CONFIGURADOR
+                    ROL_OPERADOR
+                }
+
+                class Usuario <<entity>> {
+                    - rut: String
+                    - email: String
+                    - nombre: String
+                    - apellido: String
+                    - password: String
+                    --
+                    + Usuario()
+                    + Usuario(...)
+                    + getRut(): String
+                    + getEmail(): String
+                    + getNombre(): String
+                    + getApellido(): String
+                    + getPassword(): String
+                    ..
+                    + getEstadoUsuario(): EstadoUsuario
+                    + getRolUsuario(): RolUsuario
+                }
+                Usuario --|> BaseEntity
+                'Usuario +-- Rol
+                'Usuario +-- Estado
+                Usuario --> "1" RolUsuario: - rolUsuario
+                Usuario --> "1" EstadoUsuario: - estadoUsuario
+                Usuario <.. UsuarioRepository: <<uses>>
+
+                enum TipoRegistro <<inner>> {
+                    NONE
+                    CREACION_USUARIO
+                    LOGIN_USUARIO
+                    CREACION_SIMULACION
+                    INICIO_SIMULACION
+                    UPLOAD_ARCHIVO
+                    ...
+                }
+
+                class Registro <<entity>> {
+                    - idEntidad: Long
+                    - descripcion: String
+                    - fecha: ZonedDateTime
+                    --
+                    + Registro()
+                    + Registro(...)
+                    + getIdEntidad(): Long
+                    + getDescripcion(): String
+                    + getFecha(): ZonedDateTime
+                    ..
+                    + getTipoRegistro(): TipoRegistro
+                    + getUsuario(): usuario
+                }
+                Registro --|> BaseEntity
+                Registro --> "1" TipoRegistro: - tipoRegistro
+                Registro --> "1" Usuario: - usuario
+                Registro <.. RegistroRepository: <<uses>>
+            }
+
+            package device {
+
+                enum TipoArchivo <<inner>> {
+                    NONE
+                    PNG
+                    PDF
+                    JPG
+                    ...
+                }
+
+                class Archivo <<entity>> {
+                    - nombre: String
+                    - size: Long
+                    --
+                    + Archivo()
+                    + Archivo(...)
+                    + getNombre(): String
+                    + getSize(): Long
+                    ..
+                    + getTipoArchivo(): TipoArchivo
+                }
+                Archivo --> "1" TipoArchivo: - tipoArchivo
+                Archivo --|> BaseEntity
+
+                enum EstadoEquipo <<inner>> {
+                    ESTADO_UNSPECIFIED
+                    ESTADO_PROTOTIPO
+                    ESTADO_CONSTRUCCION
+                }
+
+                class Equipo <<entity>> {
+                    - nombre: String
+                    - descripcion: String
+                    - urlRepositorio: String
+                    --
+                    + Equipo()
+                    + Equipo(...)
+                    + getNombre(): String
+                    + getDescripcion(): String
+                    + getUrlRepositorio(): String
+                    ..
+                    + getEstadoEquipo(): EstadoEquipo
+                    + getArchivos(): List<Archivo>
+                    + addArchivo(archivo: Archivo): void
+                }
+                Equipo --|> BaseEntity
+                Equipo --> "*" Archivo: - archivos: List<Archivo>
+                Equipo --> "1" EstadoEquipo: - getEstadoEquipo
+                Equipo <.. EquipoRepository: <<uses>>
+            }
+        }
+
+        package service {
+
+            class MicroSataService <<service>> {
+                - {static} PASSWORD_ENCODER: Argon2PasswordEncoder
+                - usuarioRepository: UsuarioRepository
+                - equipoRepository: EquipoRepository
+                + MicroSataService(usuarioRepo: UsuarioRepository, equipoRepository: EquipoRepository)
+                + addUsuario(usuario: Usuario): Usuario
+                + authenticate(rutEmail: String, password: String): Optional<Usuario>
+                + getUsuarios(): List<Usuario>
+                + getUsuariosSize(): Long
+                + retrieveEquipo(id: Long): Optional<Equipo>
+                + retrieveUsuario(rutEmail: String): Optional<Usuario>
+                + saveEquipo(equipo: Equipo): void
+
+            }
+            MicroSataService --> "1" EquipoRepository: - equipoRepository
+            MicroSataService --> "1" UsuarioRepository: - usuarioRepository
+
+        }
+
+        package grpc #Implementation {
+
+            class UsuarioGrpc <<autogenerated>> {
+                + UsuarioGrpc()
+            }
+
+            class EquipoGrpc <<autogenerated>> {
+                + EquipoGrpc()
+            }
+
+            class ArchivoGrpc <<autogenerated>> {
+                + ArchivoGrpc()
+            }
+            ArchivoGrpc --+ EquipoGrpc
+
+            class UsuarioServiceGprc <<autogenerated>> {
+                + UsuarioServiceGprc()
+                + login(request: LoginReq, responseObserver: StreamObserver<UsuarioGrpc>): void
+                + addUsuario(request: AddUsuarioReq, responseObserver: StreamObserver<UsuarioGrpc>): void
+                + retrieveUsuario(request: RetrieveUsuarioReq, responseObserver: StreamObserver<UsuarioGrpc>): void
+                + retrieveUsuarios(request: EmptyReq, responseObserver: StreamObserver<GetUsuarioReply>): void
+            }
+            UsuarioServiceGprc ..> UsuarioGrpc: <<uses>>
+            UsuarioServiceGprc ..> ArchivoGrpc: <<uses>>
+            UsuarioServiceGprc ..> EquipoGrpc: <<uses>>
+
+            class UsuarioServiceGrpcImpl {
+                + UsuarioServiceGrpcImpl(sataService: MicroSataService, registroRepository: RegistroRepository)
+                - {static} buildException(code: Code, message: String): StatusRuntimeException
+            }
+            UsuarioServiceGrpcImpl --> "1" MicroSataService: - sataService
+            UsuarioServiceGrpcImpl --> "1" RegistroRepository: - registroRepository
+            UsuarioServiceGrpcImpl --|> UsuarioServiceGprc
+
+        }
+
+    }
+
+    class JsonUtils {
+        - {static} GSON: Gson
+        + {static} toJson(obj: Object): String
+    }
+    JsonUtils <.. BaseEntity: <<uses>>
+
+    class ValidationUtils {
+        - {static} RUT_PATTERN: RUT_PATTERN
+        + {static} isRutValid(rut: String): Boolean
+        - {static} dv(numeric: String): String
+    }
+    ValidationUtils <.. MicroSataService: <<uses>>
+
+}
+
+@enduml

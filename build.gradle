@@ -1,0 +1,145 @@
+buildscript {
+    ext {
+        protobufVersion = '3.21.6'
+        protobufPluginVersion = '0.8.19'
+        grpcVersion = '1.49.2'
+        springVersion = '2.7.4'
+        mapstructVersion = '1.5.2.Final'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.google.protobuf:protobuf-gradle-plugin:${protobufPluginVersion}"
+    }
+}
+plugins {
+    id 'org.springframework.boot' version "${springVersion}"
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.google.protobuf' version "${protobufPluginVersion}"
+    id 'java'
+    id 'idea'
+}
+
+group 'cl.ucn.fondef'
+version '0.0.1'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring boot stuff
+    // implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // implementation 'org.springframework.session:spring-session-jdbc'
+
+    // Spring dev stuff
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // Google protocol buffers + gRPC
+    implementation "io.grpc:grpc-bom:${grpcVersion}"
+
+    // gRPC: Server + Client
+    implementation "net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE"
+    implementation "net.devh:grpc-client-spring-boot-starter:2.13.1.RELEASE"
+
+    // Database drivers
+    runtimeOnly 'com.h2database:h2'
+    // runtimeOnly 'mysql:mysql-connector-java'
+    // runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    // SQLite SQL
+    runtimeOnly 'org.xerial:sqlite-jdbc:3.39.3.0'
+    runtimeOnly 'com.github.gwenn:sqlite-dialect:0.1.2'
+
+    // Lombok!
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Crypto library
+    implementation 'org.springframework.security:spring-security-crypto:5.7.3'
+    runtimeOnly 'org.bouncycastle:bcprov-jdk15on:1.70'
+    runtimeOnly 'org.springframework:spring-jcl:5.3.23'
+//%yellow(%logger{40}.%M\(%class{0}.java:%line\))
+    // Commons Lang
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // Logger
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    // implementation 'ch.qos.logback:logback-core:1.4.1'
+    // implementation 'ch.qos.logback:logback-classic:1.4.1'
+    implementation 'org.fusesource.jansi:jansi:2.4.0'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+
+    // Mapper
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor 'no.entur.mapstruct.spi:protobuf-spi-impl:1.39'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    testImplementation 'com.asarkar.grpc:grpc-test:1.2.2'
+
+    // Lombok
+    testImplementation 'org.slf4j:slf4j-api:1.7.36'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // Databases
+    testRuntimeOnly 'com.h2database:h2'
+}
+
+
+// Protobuf configuration
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    generatedFilesBaseDir = "$projectDir/src/generated"
+    clean {
+        delete generatedFilesBaseDir
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+// Inform IntelliJ  about the generated code.
+idea {
+    module {
+        sourceDirs += file("src/generated/main/java")
+        sourceDirs += file("src/generated/main/grpc")
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+allprojects {
+    // Build all the project in the temporal directory
+    // buildDir = "${System.env.TEMP}\\gradle\\${project.name}"
+}
