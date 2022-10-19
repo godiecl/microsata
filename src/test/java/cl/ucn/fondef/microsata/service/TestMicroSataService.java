@@ -10,6 +10,7 @@ import cl.ucn.fondef.microsata.exceptions.PreRequisitesException;
 import cl.ucn.fondef.microsata.model.device.Archivo;
 import cl.ucn.fondef.microsata.model.device.Equipo;
 import cl.ucn.fondef.microsata.model.registry.Usuario;
+import cl.ucn.fondef.microsata.model.simulation.Simulacion;
 import com.google.common.base.Stopwatch;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -192,13 +194,12 @@ public class TestMicroSataService {
     @SneakyThrows
     @Test
     public void testEquipos() {
-
         log.debug("Starting the Test of Equipos ..");
 
-        // Run the database seeder
-        new DatabaseSeeder(sataService).run();
+        // run the database seeder
+        // new DatabaseSeeder(sataService).run();
 
-        // Insert a Equipo
+        // insert a Equipo
         log.debug("Add a Equipo ..");
         {
             Equipo equipo = Equipo.builder()
@@ -211,7 +212,7 @@ public class TestMicroSataService {
             this.sataService.saveEquipo(equipo);
         }
 
-        // Retrieve Equipo
+        // retrieve Equipo
         {
             Stopwatch sw = Stopwatch.createStarted();
             Optional<Equipo> oEquipo = this.sataService.retrieveEquipo(2L);
@@ -220,7 +221,7 @@ public class TestMicroSataService {
             Assertions.assertNotNull(oEquipo.get().getArchivos());
             Assertions.assertEquals(0, oEquipo.get().getArchivos().size());
 
-            // Append Archivos & Tarjetas & Componentes
+            // include archivos
             {
                 Equipo equipo = oEquipo.get();
                 equipo.addArchivo(Archivo.builder()
@@ -287,6 +288,56 @@ public class TestMicroSataService {
         }
 
         log.debug("Test Equipos: Done.");
+
+    }
+
+    /**
+     * The Test of Simulacion.
+     */
+    @SneakyThrows
+    @Test
+    public void testSimulacionAndEquipos() {
+        log.debug("Starting the Test of Simulacion+Equipo ..");
+
+        // Run the database seeder
+        new DatabaseSeeder(sataService).run();
+
+        // Insert a Equipo
+        log.debug("Add a Equipo ..");
+        {
+            Equipo equipo = Equipo.builder()
+                    .nombre("Simulador de Lluvia")
+                    .descripcion("Mix de Hardware y Software")
+                    .estadoEquipo(Equipo.EstadoEquipo.ESTADO_PROTOTIPO)
+                    .urlRepositorio("https://sata.disc.cl")
+                    .build();
+            log.debug("Equipo to Save: {}", equipo);
+            this.sataService.saveEquipo(equipo);
+        }
+
+        // Insert a Simulacion
+        {
+            Optional<Equipo> oEquipo = this.sataService.retrieveEquipo(2L);
+            Assertions.assertTrue(oEquipo.isPresent());
+
+            Simulacion simulacion = Simulacion.builder()
+                    .nombre("Simulatron v1.0")
+                    .descripcion("This is Simulatron v1.0")
+                    .equipo(oEquipo.get())
+                    .fechaCreacion(Instant.now())
+                    .build();
+            log.debug("Simulacion to Save: {}", simulacion);
+            this.sataService.saveSimulacion(simulacion);
+        }
+
+        // Retrieve the Simulations
+        Assertions.assertTrue(this.sataService.retrieveSimulaciones(1L).isEmpty());
+
+        List<Simulacion> simulaciones = this.sataService.retrieveSimulaciones(2L);
+        Assertions.assertEquals(1, simulaciones.size());
+        for (Simulacion simulacion : simulaciones) {
+            log.debug("Simulacion: {} -> {}", simulacion, simulacion.getEquipo());
+        }
 
     }
 

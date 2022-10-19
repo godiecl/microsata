@@ -4,6 +4,7 @@
 
 package cl.ucn.fondef.microsata.dao;
 
+import cl.ucn.fondef.Timer;
 import cl.ucn.fondef.microsata.model.registry.Usuario;
 import cl.ucn.fondef.microsata.service.MicroSataService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,16 +44,16 @@ public class DatabaseSeeder implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
+        final Timer timer = Timer.start();
         log.debug("Starting the database seeder ..");
 
         // Check Usuarios
         if (this.sataService.getUsuarioSize() != 0) {
             log.warn("Database already seeded, skipping!");
-        } else {
-            this.seedUsuarios();
-            // TODO: seed the tables
+            return;
         }
-        log.debug("Seeder done.");
+        this.seedUsuarios();
+        log.debug("Seeder done in: {}ms.", timer.millis());
     }
 
     /**
