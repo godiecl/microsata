@@ -1,10 +1,15 @@
 buildscript {
     ext {
-        protobufVersion = '3.21.6'
-        protobufPluginVersion = '0.8.19'
-        grpcVersion = '1.49.2'
-        springVersion = '2.7.4'
-        mapstructVersion = '1.5.2.Final'
+        // https://mvnrepository.com/artifact/com.google.protobuf/protoc
+        protobufVersion = '3.21.10'
+        // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-gradle-plugin
+        protobufPluginVersion = '0.9.1'
+        // https://mvnrepository.com/artifact/io.grpc/grpc-bom
+        grpcVersion = '1.51.0'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+        springVersion = '2.7.6'
+        // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
+        mapstructVersion = '1.5.3.Final'
     }
     repositories {
         mavenCentral()
@@ -15,7 +20,7 @@ buildscript {
 }
 plugins {
     id 'org.springframework.boot' version "${springVersion}"
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'com.google.protobuf' version "${protobufPluginVersion}"
     id 'java'
     id 'idea'
@@ -40,7 +45,7 @@ dependencies {
     // implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // implementation 'org.springframework.session:spring-session-jdbc'
@@ -51,6 +56,7 @@ dependencies {
 
     // Google protocol buffers + gRPC
     implementation "io.grpc:grpc-bom:${grpcVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 
     // gRPC: Server + Client
     implementation "net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE"
@@ -72,7 +78,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-crypto:5.7.3'
     runtimeOnly 'org.bouncycastle:bcprov-jdk15on:1.70'
     runtimeOnly 'org.springframework:spring-jcl:5.3.23'
-//%yellow(%logger{40}.%M\(%class{0}.java:%line\))
+
     // Commons Lang
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
@@ -83,12 +89,12 @@ dependencies {
     implementation 'org.fusesource.jansi:jansi:2.4.0'
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10'
 
     // Mapper
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    annotationProcessor 'no.entur.mapstruct.spi:protobuf-spi-impl:1.39'
+    annotationProcessor 'no.entur.mapstruct.spi:protobuf-spi-impl:1.41'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
