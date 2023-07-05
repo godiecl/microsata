@@ -1,5 +1,5 @@
 commonmark==0.9.1
-grpcio==1.49.1
+grpcio==1.53.0
 grpcio-tools==1.49.1
 protobuf==4.21.7
 Pygments==2.13.0
